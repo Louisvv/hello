@@ -36,6 +36,14 @@ export CLASSPATH=$JAVA_HOME/lib:JAVA_HOME/jre/lib
 export PATH=$PATH:$JAVA_HOME/bin
 '>> /etc/profile
 
+scp -r /usr/local/jdk1.7 root@node1:/usr/local/jdk1.7
+scp -r /usr/local/jdk1.7 root@node2:/usr/local/jdk1.7
+scp -r /usr/local/jdk1.7 root@node3:/usr/local/jdk1.7
+scp -r /usr/local/jdk1.7 root@node4:/usr/local/jdk1.7
+scp -r /usr/local/jdk1.7 root@node5:/usr/local/jdk1.7
+scp -r /usr/local/jdk1.7 root@node6:/usr/local/jdk1.7
+scp -r /usr/local/jdk1.7 root@node7:/usr/local/jdk1.7
+
 
 #set Hadoop home
 
@@ -44,6 +52,8 @@ mkdir software
 cd software
 mkdir hadoop-2.2
 tar -zxvf hadoop2.2 -C ./hadoop-2.2
+ 
+
 
 echo '
 #set Hadoop home
@@ -55,11 +65,13 @@ export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib"
 
 source /etc/profile
 
-scp /etc/profile root@node1:/etc/profile;
-scp /etc/profile root@node1:/etc/profile;
-scp /etc/profile root@node1:/etc/profile;
-scp /etc/profile root@node1:/etc/profile;
-scp /etc/profile root@node1:/etc/profile;
+scp /etc/profile root@node1:/etc/profile
+scp /etc/profile root@node2:/etc/profile
+scp /etc/profile root@node3:/etc/profile
+scp /etc/profile root@node4:/etc/profile
+scp /etc/profile root@node5:/etc/profile
+scp /etc/profile root@node6:/etc/profile
+scp /etc/profile root@node7:/etc/profile
 
 
 
@@ -218,8 +230,15 @@ if [ $num_of_slaves -gt 1 ]
         fi
 	# make sure that slave:$HADOOP_HOME is not exist
 	#need to modify your username
-        scp -r $HADOOP_HOME ubuntu@$slave:$HADOOP_HOME
+        scp -r $HADOOP_HOME root@$slave:$HADOOP_HOME
         done
     else
     echo "no need "
 fi
+
+scp -r /home/software/hadoop-2.2  root@node1:/home/software/hadoop-2.2
+scp -r /home/software/hadoop-2.2  root@node1:/home/software/hadoop-2.2
+scp -r /home/software/hadoop-2.2  root@node1:/home/software/hadoop-2.2
+scp -r /home/software/hadoop-2.2  root@node1:/home/software/hadoop-2.2
+scp -r /home/software/hadoop-2.2  root@node1:/home/software/hadoop-2.2
+
