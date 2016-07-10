@@ -1,27 +1,12 @@
 #!/bin/sh
 #hadoop部署脚本，不一定能够执行~水平有限见谅
+#没有配7个节点的集群,伪分布单节点安装
 
 ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys
 
-read -p "输入远端服务器IP: " ip
-ssh-copy-id -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.pub root@$ip
-ssh root@$ip 'sed -i "s/^#RSAAuthentication\ yes/RSAAuthentication\ yes/g" /etc/ssh/sshd_config'
-ssh root@$ip 'sed -i "s/^#PubkeyAuthentication\ yes/PubkeyAuthentication yes/g" /etc/ssh/sshd_config'
-ssh root@$ip 'sed -i "s/^#PermitRootLogin\ yes/PermitRootLogin\ yes/g" /etc/ssh/sshd_config'
-ssh root@$ip 'service sshd restart'
-hostname=`ssh root@${ip} 'hostname'`
-echo "添加主机名和IP到本地/etc/hosts文件中"
-echo "$ip    $hostname" >> /etc/hosts
-echo "远端主机主机名称为$hostname, 请查看 /etc/hosts 确保该主机名和IP添加到主机列表文件中"
-echo "主机公钥复制完成"
-
-cat /etc/hosts | while read LINE
-do
-    ip=`echo $LINE | awk '{print $1}' | grep -v "::" | grep -v "127.0.0.1"`
-    echo "Copying /etc/hosts to ${ip}"
-    scp -o StrictHostKeyChecking=no /etc/hosts root@${ip}:/etc/
-done
+service iptables stop
+chkconfig iptable off 
 
 
 cd /usr/local/ 
@@ -36,13 +21,6 @@ export CLASSPATH=$JAVA_HOME/lib:JAVA_HOME/jre/lib
 export PATH=$PATH:$JAVA_HOME/bin
 '>> /etc/profile
 
-scp -r /usr/local/jdk1.7 root@node1:/usr/local/jdk1.7
-scp -r /usr/local/jdk1.7 root@node2:/usr/local/jdk1.7
-scp -r /usr/local/jdk1.7 root@node3:/usr/local/jdk1.7
-scp -r /usr/local/jdk1.7 root@node4:/usr/local/jdk1.7
-scp -r /usr/local/jdk1.7 root@node5:/usr/local/jdk1.7
-scp -r /usr/local/jdk1.7 root@node6:/usr/local/jdk1.7
-scp -r /usr/local/jdk1.7 root@node7:/usr/local/jdk1.7
 
 
 #set Hadoop home
@@ -65,13 +43,7 @@ export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib"
 
 source /etc/profile
 
-scp /etc/profile root@node1:/etc/profile
-scp /etc/profile root@node2:/etc/profile
-scp /etc/profile root@node3:/etc/profile
-scp /etc/profile root@node4:/etc/profile
-scp /etc/profile root@node5:/etc/profile
-scp /etc/profile root@node6:/etc/profile
-scp /etc/profile root@node7:/etc/profile
+
 
 
 
@@ -236,9 +208,8 @@ if [ $num_of_slaves -gt 1 ]
     echo "no need "
 fi
 
-scp -r /home/software/hadoop-2.2  root@node1:/home/software/hadoop-2.2
-scp -r /home/software/hadoop-2.2  root@node1:/home/software/hadoop-2.2
-scp -r /home/software/hadoop-2.2  root@node1:/home/software/hadoop-2.2
-scp -r /home/software/hadoop-2.2  root@node1:/home/software/hadoop-2.2
-scp -r /home/software/hadoop-2.2  root@node1:/home/software/hadoop-2.2
-
+$Hadoop_home/bin/hadoop namenode -format
+cd  $Hadoop_home/sbin
+./start-dfs.sh
+./start-yarn.sh
+jps
